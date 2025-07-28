@@ -36,17 +36,33 @@ The proposed system will be a script-based solution, likely written in Python du
 
 ### **Diagram**
 
-\+----------------------+      \+----------------------+      \+------------------------+      \+---------------------+  
-|                      |      |                      |      |                        |      |                     |  
-|   Zendesk API        \<-----\>|  Extraction Script   |-----\>|  Transformation Module |-----\>|  Storage (JSON/XML) |  
-| (Tickets & Comments) |      |   (Python)           |      |  (JSON \-\> XML)         |      |                     |  
-\+----------------------+      \+----------------------+      \+------------------------+      \+---------------------+  
-        ^  
-        |  
-\+----------------------+  
-|  Authentication      |  
-|  (API Token)         |  
-\+----------------------+
+```mermaid
+graph TD
+    subgraph "Zendesk API"
+        A[Tickets & Comments]
+    end
+
+    subgraph "Extraction Script (Python)"
+        B[Extraction Module]
+    end
+
+    subgraph "Transformation Module"
+        C[JSON -> XML]
+    end
+
+    subgraph "Storage"
+        D[JSON/XML]
+    end
+
+    subgraph "Authentication"
+        E[API Token]
+    end
+
+    A <--> B
+    B --> C
+    C --> D
+    E --> B
+```
 
 ## **5\. Zendesk API Endpoints**
 
