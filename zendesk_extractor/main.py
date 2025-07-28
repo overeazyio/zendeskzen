@@ -20,3 +20,33 @@ def get_zendesk_session():
     session.headers.update({"Accept": "application/json"})
     session.base_url = f"https://{domain}.zendesk.com/api/v2"
     return session
+
+def fetch_tickets(session, start_time=None):
+    """
+    Retrieves a list of tickets from Zendesk, handling API pagination.
+    """
+    tickets = []
+    url = f"{session.base_url}/search.json"
+    params = {}
+
+    if start_time:
+        params["query"] = f"type:ticket created>={start_time}"
+
+    while url:
+        try:
+            response = session.get(url, params=params)
+            response.raise_for_status()
+            data = response.json()
+            tickets.extend(data["results"])
+
+            if data.get("meta", {}).get("has_more"):
+                url = data["links"]["next"]
+                params = {}  # Clear params for subsequent requests as the full URL is provided
+            else:
+                url = None
+
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred: {e}")
+            return None
+
+    return tickets
