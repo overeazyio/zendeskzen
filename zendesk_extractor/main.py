@@ -4,13 +4,17 @@ import requests
 import logging
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
+from typing import List, Dict, Any, Optional
+from requests import Session
 from transformation import transform_to_structured_json, convert_to_xml
+from models import Ticket
+from dataclasses import asdict
 
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def get_zendesk_session():
+def get_zendesk_session() -> Session:
     """
     Creates and returns a requests.Session object for interacting with the Zendesk API.
     """
@@ -27,7 +31,7 @@ def get_zendesk_session():
     session.base_url = f"https://{domain}.zendesk.com/api/v2"
     return session
 
-def fetch_tickets(session, start_time=None):
+def fetch_tickets(session: Session, start_time: Optional[str] = None) -> Optional[List[Dict[str, Any]]]:
     """
     Retrieves a list of tickets from Zendesk, handling API pagination.
     """
@@ -57,7 +61,7 @@ def fetch_tickets(session, start_time=None):
 
     return tickets
 
-def fetch_ticket_comments(session, ticket_id):
+def fetch_ticket_comments(session: Session, ticket_id: int) -> Optional[List[Dict[str, Any]]]:
     """
     Retrieves all comments for a single ticket, handling pagination.
     """
@@ -86,7 +90,7 @@ def fetch_ticket_comments(session, ticket_id):
     return comments
 
 
-def save_as_json(ticket_id, data):
+def save_as_json(ticket_id: int, data: Ticket) -> None:
     """
     Saves the structured data as a JSON file.
     """
@@ -94,10 +98,10 @@ def save_as_json(ticket_id, data):
     os.makedirs(directory, exist_ok=True)
     filepath = os.path.join(directory, f"{ticket_id}.json")
     with open(filepath, "w") as f:
-        json.dump(data, f, indent=2)
+        json.dump(asdict(data), f, indent=2)
 
 
-def save_as_xml(ticket_id, xml_string):
+def save_as_xml(ticket_id: int, xml_string: str) -> None:
     """
     Saves the XML data as an XML file.
     """
@@ -108,7 +112,7 @@ def save_as_xml(ticket_id, xml_string):
         f.write(xml_string)
 
 
-def main():
+def main() -> None:
     """
     Main function to orchestrate the Zendesk ticket processing.
     """

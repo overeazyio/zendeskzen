@@ -1,43 +1,46 @@
 import xml.etree.ElementTree as ET
+from typing import Dict, Any, List, Optional
+from models import Ticket, Comment
+from dataclasses import asdict
 
-def transform_to_structured_json(ticket_data, comments_data):
+def transform_to_structured_json(ticket_data: Dict[str, Any], comments_data: List[Dict[str, Any]]) -> Optional[Ticket]:
     """
     Transforms raw ticket and comment data into a structured JSON format.
     """
     if not ticket_data:
         return None
 
-    structured_data = {
-        "ticket_id": ticket_data.get("id"),
-        "created_at": ticket_data.get("created_at"),
-        "updated_at": ticket_data.get("updated_at"),
-        "subject": ticket_data.get("subject"),
-        "status": ticket_data.get("status"),
-        "requester_id": ticket_data.get("requester_id"),
-        "assignee_id": ticket_data.get("assignee_id"),
-        "tags": ticket_data.get("tags"),
-        "conversation": []
-    }
-
+    conversation = []
     if comments_data:
         for comment in comments_data:
-            structured_data["conversation"].append({
-                "comment_id": comment.get("id"),
-                "author_id": comment.get("author_id"),
-                "body": comment.get("body"),
-                "created_at": comment.get("created_at")
-            })
+            conversation.append(Comment(
+                comment_id=comment.get("id"),
+                author_id=comment.get("author_id"),
+                body=comment.get("body"),
+                created_at=comment.get("created_at")
+            ))
 
-    return structured_data
+    return Ticket(
+        ticket_id=ticket_data.get("id"),
+        created_at=ticket_data.get("created_at"),
+        updated_at=ticket_data.get("updated_at"),
+        subject=ticket_data.get("subject"),
+        status=ticket_data.get("status"),
+        requester_id=ticket_data.get("requester_id"),
+        assignee_id=ticket_data.get("assignee_id"),
+        tags=ticket_data.get("tags"),
+        conversation=conversation
+    )
 
 
-def convert_to_xml(structured_data):
+def convert_to_xml(ticket: Ticket) -> Optional[str]:
     """
-    Converts a structured Python dictionary to an XML string.
+    Converts a Ticket object to an XML string.
     """
-    if not structured_data:
+    if not ticket:
         return None
 
+    structured_data = asdict(ticket)
     root = ET.Element("ticket")
 
     for key, value in structured_data.items():
