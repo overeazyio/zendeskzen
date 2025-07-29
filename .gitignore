@@ -1,0 +1,25 @@
+# Log files
+server.log
+last_run.txt
+
+# Output directories
+output/
+
+# Python virtual environment
+.venv/
+venv/
+env/
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Docker
+.dockerignore
+Dockerfile
+
+# IDE
+.idea/
+.vscode/
