@@ -59,7 +59,7 @@ graph TD
     A[Open Web Browser] --> B{Go to http://localhost:8000};
     B --> C[View existing files];
     C --> D{Click a file to open in new tab};
-    B --> E[Click "Extract Data" button];
+    B --> E[Click Extract Data button];
     E --> F{Wait for extraction to complete};
     F --> G[File list is refreshed];
     G --> C;
