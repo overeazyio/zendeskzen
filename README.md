@@ -57,18 +57,19 @@ The web interface provides a simple way to interact with the Zendesk Data Extrac
 ```mermaid
 graph TD
     A[Open Web Browser] --> B{Go to http://localhost:8000};
-    B --> C[Click the "Start Extraction" button];
-    C --> D{Wait for Extraction to Complete};
-    D --> E[Browse Extracted Files];
-    E --> F[Download JSON or XML files];
+    B --> C[View existing files];
+    C --> D{Click a file to open in new tab};
+    B --> E[Click "Extract Data" button];
+    E --> F{Wait for extraction to complete};
+    F --> G[File list is refreshed];
+    G --> C;
 ```
 
 ### Steps
 
-1.  **Start the Extraction:** Click the "Start Extraction" button to begin the process of fetching data from Zendesk.
-2.  **Monitor the Process:** The application will log the progress of the extraction in the console.
-3.  **View Extracted Data:** Once the extraction is complete, the extracted files will be listed on the web page. You can browse the JSON and XML files that have been generated.
-4.  **Download Files:** Click on any file name to download it to your local machine.
+1.  **View Extracted Data:** When you open the web application, it will automatically load and display a list of any data that has already been extracted.
+2.  **Open Files:** Click on any file name to open it in a new browser tab.
+3.  **Start a New Extraction:** Click the "Extract Data" button to begin the process of fetching new data from Zendesk. The file list will refresh automatically when the process is complete.
 
 ## Technical Documentation
 
