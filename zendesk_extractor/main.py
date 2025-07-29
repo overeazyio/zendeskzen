@@ -1,9 +1,14 @@
 import os
 import json
 import requests
+import logging
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
+from transformation import transform_to_structured_json, convert_to_xml
 
 load_dotenv()
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def get_zendesk_session():
     """
@@ -103,53 +108,53 @@ def save_as_xml(ticket_id, xml_string):
         f.write(xml_string)
 
 
+def main():
+    """
+    Main function to orchestrate the Zendesk ticket processing.
+    """
+    try:
+        session = get_zendesk_session()
+    except ValueError as e:
+        logging.error(f"Failed to initialize Zendesk session: {e}")
+        return
+
+    start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+    tickets = fetch_tickets(session, start_time=start_date)
+
+    if not tickets:
+        logging.info("No tickets found for the specified period.")
+        return
+
+    logging.info(f"Found {len(tickets)} tickets.")
+
+    for ticket in tickets:
+        ticket_id = ticket["id"]
+        logging.info(f"Processing ticket ID: {ticket_id}")
+        try:
+            comments = fetch_ticket_comments(session, ticket_id)
+            if comments is None:
+                logging.warning(f"Could not fetch comments for ticket {ticket_id}. Skipping.")
+                continue
+
+            structured_data = transform_to_structured_json(ticket, comments)
+            if structured_data is None:
+                logging.warning(f"Could not transform data for ticket {ticket_id}. Skipping.")
+                continue
+
+            save_as_json(ticket_id, structured_data)
+
+            xml_data = convert_to_xml(structured_data)
+            if xml_data is None:
+                logging.warning(f"Could not convert data to XML for ticket {ticket_id}. Skipping.")
+                continue
+
+            save_as_xml(ticket_id, xml_data)
+
+            logging.info(f"Successfully processed and saved ticket ID: {ticket_id}")
+
+        except Exception as e:
+            logging.error(f"An unexpected error occurred while processing ticket {ticket_id}: {e}")
+            continue
+
 if __name__ == "__main__":
-    # Example Usage (without making live API calls)
-    # You can replace this with actual API calls if you have credentials
-
-    # Sample raw data
-    sample_ticket_data = {
-        "id": 12345,
-        "created_at": "2023-10-27T10:30:00Z",
-        "updated_at": "2023-10-27T12:00:00Z",
-        "subject": "Issue with billing",
-        "status": "closed",
-        "requester_id": 98765,
-        "assignee_id": 54321,
-        "tags": ["billing", "invoice"]
-    }
-
-    sample_comments_data = [
-        {
-            "id": 111,
-            "author_id": 98765,
-            "body": "Hello, I have a question about my recent invoice.",
-            "created_at": "2023-10-27T10:30:00Z"
-        },
-        {
-            "id": 222,
-            "author_id": 54321,
-            "body": "Hi there, I can help with that. What is your question?",
-            "created_at": "2023-10-27T10:35:00Z"
-        }
-    ]
-
-    # Import the transformation functions
-    from transformation import transform_to_structured_json, convert_to_xml
-
-    # 1. Transform to structured JSON
-    structured_json = transform_to_structured_json(sample_ticket_data, sample_comments_data)
-    print("Structured JSON:")
-    import json
-    print(json.dumps(structured_json, indent=2))
-
-    # 2. Convert to XML
-    xml_data = convert_to_xml(structured_json)
-    print("\nXML Data:")
-    print(xml_data)
-
-    # 3. Save files
-    ticket_id = sample_ticket_data["id"]
-    save_as_json(ticket_id, structured_json)
-    save_as_xml(ticket_id, xml_data)
-    print(f"\nSaved ticket {ticket_id} as JSON and XML.")
+    main()
