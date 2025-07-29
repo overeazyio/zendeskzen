@@ -2,9 +2,9 @@ import unittest
 from unittest.mock import patch, MagicMock, mock_open
 import requests
 import os
-from zendesk_extractor.main import get_zendesk_session, fetch_tickets, fetch_ticket_comments, save_as_json, save_as_xml, main
-from zendesk_extractor.exceptions import ZendeskAPIError, FileSaveError
-from zendesk_extractor.models import Ticket, Comment
+from zendesk_extractor.core.main import get_zendesk_session, fetch_tickets, fetch_ticket_comments, save_as_json, save_as_xml, main
+from zendesk_extractor.core.exceptions import ZendeskAPIError, FileSaveError
+from zendesk_extractor.core.models import Ticket, Comment
 
 class TestZendeskExtractor(unittest.TestCase):
 
@@ -90,13 +90,13 @@ class TestZendeskExtractor(unittest.TestCase):
         with self.assertRaises(FileSaveError):
             save_as_xml(123, "<xml></xml>")
 
-    @patch('zendesk_extractor.main.get_zendesk_session')
-    @patch('zendesk_extractor.main.fetch_tickets')
-    @patch('zendesk_extractor.main.fetch_ticket_comments')
-    @patch('zendesk_extractor.main.transform_to_structured_json')
-    @patch('zendesk_extractor.main.convert_to_xml')
-    @patch('zendesk_extractor.main.save_as_json')
-    @patch('zendesk_extractor.main.save_as_xml')
+    @patch('zendesk_extractor.core.main.get_zendesk_session')
+    @patch('zendesk_extractor.core.main.fetch_tickets')
+    @patch('zendesk_extractor.core.main.fetch_ticket_comments')
+    @patch('zendesk_extractor.core.main.transform_to_structured_json')
+    @patch('zendesk_extractor.core.main.convert_to_xml')
+    @patch('zendesk_extractor.core.main.save_as_json')
+    @patch('zendesk_extractor.core.main.save_as_xml')
     def test_main_success(self, mock_save_xml, mock_save_json, mock_convert_xml, mock_transform_json, mock_fetch_comments, mock_fetch_tickets, mock_get_session):
         mock_get_session.return_value = MagicMock()
         mock_fetch_tickets.return_value = [{"id": 1}]

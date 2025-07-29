@@ -1,6 +1,6 @@
 import unittest
-from zendesk_extractor.transformation import transform_to_structured_json, convert_to_xml
-from zendesk_extractor.models import Ticket, Comment
+from zendesk_extractor.core.transformation import transform_to_structured_json, convert_to_xml
+from zendesk_extractor.core.models import Ticket, Comment
 
 class TestTransformation(unittest.TestCase):
 

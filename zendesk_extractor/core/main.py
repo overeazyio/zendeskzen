@@ -6,10 +6,10 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from typing import List, Dict, Any, Optional
 from requests import Session
-from .transformation import transform_to_structured_json, convert_to_xml
-from .models import Ticket
+from zendesk_extractor.core.transformation import transform_to_structured_json, convert_to_xml
+from zendesk_extractor.core.models import Ticket
 from dataclasses import asdict
-from zendesk_extractor.exceptions import ZendeskAPIError
+from zendesk_extractor.core.exceptions import ZendeskAPIError
 
 load_dotenv()
 
@@ -126,7 +126,7 @@ def fetch_ticket_comments(session: Session, ticket_id: int) -> Optional[List[Dic
     return comments
 
 
-from zendesk_extractor.exceptions import FileSaveError
+from zendesk_extractor.core.exceptions import FileSaveError
 
 def save_as_json(ticket_id: int, data: Ticket) -> None:
     """Saves the structured data as a JSON file.
@@ -174,7 +174,7 @@ def save_as_xml(ticket_id: int, xml_string: str) -> None:
         raise FileSaveError(f"Error saving XML file for ticket {ticket_id}: {e}")
 
 
-from zendesk_extractor.exceptions import ZendeskExtractorError
+from zendesk_extractor.core.exceptions import ZendeskExtractorError
 
 def main() -> None:
     """Main function to orchestrate the Zendesk ticket processing.
