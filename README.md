@@ -1,71 +1,30 @@
-# **Technical Design Document: Zendesk Data Extraction**
+# Zendesk Data Extractor
 
-## **1. Introduction**
+This project provides a simple and effective solution for extracting historical customer conversation data from Zendesk. It allows you to fetch ticket data, including full conversation histories, and save it in both JSON and XML formats. This is ideal for a variety of use cases, from data analysis and AI/ML modeling to manual review and archiving.
 
-This document outlines the technical design for a solution to extract historical customer conversation data from Zendesk. The current method of manually requesting data from Zendesk support is not scalable, is time-consuming, and lacks the necessary flexibility for querying.
+The application includes a web interface to easily trigger the extraction process and browse the extracted data.
 
-The proposed solution is to build a data pipeline that programmatically extracts ticket data, including the full conversation history, using the Zendesk API. This will enable the data to be used for AI/ML modeling (e.g., sentiment analysis, topic modeling) and for manual review in a human-readable format.
+## Key Features
 
-This project now includes a web interface to trigger the extraction process and view the extracted data.
+*   **Automated Data Extraction:** Programmatically extract ticket data from Zendesk, eliminating the need for manual data requests.
+*   **Dual-Format Output:** Get your data in both JSON (ideal for data processing) and XML (for easy manual review).
+*   **Simple Web Interface:** A user-friendly web UI to start the extraction process and view the results.
+*   **Easy to Deploy:** Run the entire application with a single Docker command.
+*   **Secure:** Uses environment variables to keep your Zendesk API credentials safe.
 
-## **2. Goals**
+## Getting Started
 
-*   **Primary Goal:** To build an automated and scalable data pipeline to extract complete customer conversation data from Zendesk.
-*   **Secondary Goal:** To provide the extracted data in two formats:
-    *   **JSON:** For ingestion into AI/ML models and other data systems.
-    *   **XML:** For manual review by internal teams.
-*   **Tertiary Goal:** To provide a simple web interface for initiating and monitoring the extraction process.
+The easiest way to get started is by using Docker.
 
-## **3. System Architecture**
+### Prerequisites
 
-The system is composed of a core extraction library and a web application.
+*   [Docker](https://www.docker.com/get-started) installed on your machine.
+*   Your Zendesk API credentials:
+    *   Your Zendesk domain (e.g., `your-company.zendesk.com`)
+    *   The email address associated with your Zendesk account.
+    *   A Zendesk API token. You can generate one by following [these instructions](https://support.zendesk.com/hc/en-us/articles/226022787-Generating-a-new-API-token).
 
-### **Core Library**
-
-The core library is responsible for handling the communication with the Zendesk API, transforming the data, and saving it to the local filesystem. It is designed to be reusable and can be integrated into other applications.
-
-### **Web Application**
-
-The web application is built using FastAPI and provides a simple user interface for interacting with the core library. It allows users to trigger the extraction process and view the extracted files.
-
-### **Diagram**
-
-```mermaid
-graph TD
-    subgraph "Zendesk API"
-        A[Tickets & Comments]
-    end
-
-    subgraph "Extraction Script (Python)"
-        B[Extraction Module]
-    end
-
-    subgraph "Transformation Module"
-        C[JSON -> XML]
-    end
-
-    subgraph "Storage"
-        D[JSON/XML]
-    end
-
-    subgraph "Authentication"
-        E[API Token]
-    end
-
-    subgraph "Web Application"
-        F[Web UI]
-    end
-
-    A <--> B
-    B --> C
-    C --> D
-    E --> B
-    F --> B
-```
-
-## **4. Running the Application with Docker**
-
-The easiest way to run the application is with Docker.
+### Running the Application
 
 1.  **Build the Docker image:**
 
@@ -76,22 +35,100 @@ The easiest way to run the application is with Docker.
 2.  **Run the Docker container:**
 
     ```bash
-    docker run -p 8000:8000 -e ZENDESK_DOMAIN="your_zendesk_domain" -e ZENDESK_EMAIL="your_zendesk_email" -e ZENDESK_API_TOKEN="your_zendesk_api_token" zendesk-extractor
+    docker run -p 8000:8000 \
+      -e ZENDESK_DOMAIN="your_zendesk_domain" \
+      -e ZENDESK_EMAIL="your_zendesk_email" \
+      -e ZENDESK_API_TOKEN="your_zendesk_api_token" \
+      zendesk-extractor
     ```
 
     Replace `"your_zendesk_domain"`, `"your_zendesk_email"`, and `"your_zendesk_api_token"` with your actual Zendesk credentials.
 
-3.  **Access the web interface:**
+3.  **Access the Web Interface:**
 
-    Open your web browser and go to `http://localhost:8000`.
+    Open your web browser and navigate to `http://localhost:8000`.
 
-## **5. Security Considerations**
+## User Guide
 
-*   The Zendesk API token is a sensitive credential and must be stored securely. It should not be committed to version control. Using environment variables is a good practice.
-*   Access to the extracted data should be restricted to authorized personnel.
+The web interface provides a simple way to interact with the Zendesk Data Extractor.
 
-## **6. Future Enhancements**
+### User Flow
 
-*   **Incremental Backups:** The script could be modified to only fetch tickets that have been updated since the last run.
-*   **Database Integration:** The extracted data could be loaded directly into a database (e.g., PostgreSQL, BigQuery) for more advanced querying and analysis.
-*   **Authentication for the Web UI:** The web interface could be protected with a login system to restrict access to authorized users.
+```mermaid
+graph TD
+    A[Open Web Browser] --> B{Go to http://localhost:8000};
+    B --> C[Click the "Start Extraction" button];
+    C --> D{Wait for Extraction to Complete};
+    D --> E[Browse Extracted Files];
+    E --> F[Download JSON or XML files];
+```
+
+### Steps
+
+1.  **Start the Extraction:** Click the "Start Extraction" button to begin the process of fetching data from Zendesk.
+2.  **Monitor the Process:** The application will log the progress of the extraction in the console.
+3.  **View Extracted Data:** Once the extraction is complete, the extracted files will be listed on the web page. You can browse the JSON and XML files that have been generated.
+4.  **Download Files:** Click on any file name to download it to your local machine.
+
+## Technical Documentation
+
+This section provides a more detailed overview of the system architecture and data flow.
+
+### System Architecture
+
+The application is composed of two main components:
+
+*   **Core Library (`zendesk_extractor/core`):** A Python library responsible for all interactions with the Zendesk API. It handles authentication, data fetching, transformation, and file saving.
+*   **Web Application (`zendesk_extractor/web`):** A FastAPI web application that provides a UI for the core library.
+
+### Data Flow
+
+The following diagram illustrates how data flows through the system:
+
+```mermaid
+graph TD
+    subgraph "User Interaction"
+        A[User triggers extraction via Web UI]
+    end
+
+    subgraph "Web Application (FastAPI)"
+        B[POST /extract]
+    end
+
+    subgraph "Core Library (Python)"
+        C[Get Zendesk Session]
+        D[Fetch Tickets & Comments]
+        E[Transform to Structured JSON]
+        F[Convert to XML]
+    end
+
+    subgraph "Zendesk API"
+        G[Zendesk Tickets API]
+    end
+
+    subgraph "Local Storage"
+        H[Save as JSON]
+        I[Save as XML]
+    end
+
+    A --> B;
+    B --> C;
+    C --> D;
+    D <--> G;
+    D --> E;
+    E --> F;
+    E --> H;
+    F --> I;
+```
+
+## Security Considerations
+
+*   **API Token Security:** Your Zendesk API token is a sensitive credential. It is strongly recommended to use environment variables to manage your credentials, as shown in the "Getting Started" section. Do not hardcode your credentials in the source code.
+*   **Data Security:** The extracted data is stored on the local filesystem of the machine running the application. Ensure that access to this machine is restricted to authorized personnel.
+
+## Future Enhancements
+
+*   **Incremental Backups:** Modify the script to only fetch tickets that have been updated since the last run. This would make the extraction process more efficient.
+*   **Database Integration:** Load the extracted data directly into a database (e.g., PostgreSQL, BigQuery) for more advanced querying and analysis.
+*   **Web UI Authentication:** Add a login system to the web interface to restrict access to authorized users.
+*   **Error Handling and Reporting:** Enhance the error handling and provide more detailed feedback in the web UI when an extraction fails.
