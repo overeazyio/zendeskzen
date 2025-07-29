@@ -16,8 +16,18 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def get_zendesk_session() -> Session:
-    """
-    Creates and returns a requests.Session object for interacting with the Zendesk API.
+    """Creates and returns a requests.Session object for interacting with the Zendesk API.
+
+    This function retrieves Zendesk API credentials (domain, email, and token) from
+    environment variables, validates their presence, and initializes a requests.Session
+    object with the necessary authentication headers and base URL.
+
+    Returns:
+        A requests.Session object configured for the Zendesk API.
+
+    Raises:
+        ZendeskAPIError: If the API credentials are not found in the environment
+                         variables or if the session creation fails.
     """
     try:
         domain = os.getenv("ZENDESK_DOMAIN")
@@ -36,8 +46,21 @@ def get_zendesk_session() -> Session:
         raise ZendeskAPIError(f"Failed to create Zendesk session: {e}")
 
 def fetch_tickets(session: Session, start_time: Optional[str] = None) -> Optional[List[Dict[str, Any]]]:
-    """
-    Retrieves a list of tickets from Zendesk, handling API pagination.
+    """Retrieves a list of tickets from Zendesk, handling API pagination.
+
+    This function queries the Zendesk search API for tickets created after a specified
+    time. It automatically handles pagination to fetch all available tickets.
+
+    Args:
+        session: The requests.Session object for making API calls.
+        start_time: An optional ISO 8601 formatted date string to filter tickets
+                    created after this time.
+
+    Returns:
+        A list of ticket dictionaries, or None if no tickets are found.
+
+    Raises:
+        ZendeskAPIError: If an error occurs while fetching tickets from the API.
     """
     tickets = []
     url = f"{session.base_url}/search.json"
@@ -65,8 +88,21 @@ def fetch_tickets(session: Session, start_time: Optional[str] = None) -> Optiona
     return tickets
 
 def fetch_ticket_comments(session: Session, ticket_id: int) -> Optional[List[Dict[str, Any]]]:
-    """
-    Retrieves all comments for a single ticket, handling pagination.
+    """Retrieves all comments for a single ticket, handling pagination.
+
+    This function fetches all comments for a given ticket ID, automatically
+    handling pagination to ensure all comments are retrieved.
+
+    Args:
+        session: The requests.Session object for making API calls.
+        ticket_id: The ID of the ticket to fetch comments for.
+
+    Returns:
+        A list of comment dictionaries, or None if no comments are found.
+
+    Raises:
+        ZendeskAPIError: If the ticket is not found or an error occurs while
+                         fetching comments.
     """
     comments = []
     url = f"{session.base_url}/tickets/{ticket_id}/comments.json"
@@ -93,8 +129,17 @@ def fetch_ticket_comments(session: Session, ticket_id: int) -> Optional[List[Dic
 from zendesk_extractor.exceptions import FileSaveError
 
 def save_as_json(ticket_id: int, data: Ticket) -> None:
-    """
-    Saves the structured data as a JSON file.
+    """Saves the structured data as a JSON file.
+
+    This function saves the given Ticket object as a JSON file in the
+    `output/json` directory. The filename is based on the ticket ID.
+
+    Args:
+        ticket_id: The ID of the ticket, used for the filename.
+        data: The Ticket object to be saved.
+
+    Raises:
+        FileSaveError: If an error occurs while saving the file.
     """
     try:
         directory = "output/json"
@@ -107,8 +152,17 @@ def save_as_json(ticket_id: int, data: Ticket) -> None:
 
 
 def save_as_xml(ticket_id: int, xml_string: str) -> None:
-    """
-    Saves the XML data as an XML file.
+    """Saves the XML data as an XML file.
+
+    This function saves the given XML string as an XML file in the
+    `output/xml` directory. The filename is based on the ticket ID.
+
+    Args:
+        ticket_id: The ID of the ticket, used for the filename.
+        xml_string: The XML content to be saved.
+
+    Raises:
+        FileSaveError: If an error occurs while saving the file.
     """
     try:
         directory = "output/xml"
@@ -123,8 +177,11 @@ def save_as_xml(ticket_id: int, xml_string: str) -> None:
 from zendesk_extractor.exceptions import ZendeskExtractorError
 
 def main() -> None:
-    """
-    Main function to orchestrate the Zendesk ticket processing.
+    """Main function to orchestrate the Zendesk ticket processing.
+
+    This function orchestrates the entire process of fetching tickets from Zendesk,
+    transforming them into structured JSON and XML formats, and saving them to files.
+    It handles errors gracefully and logs the progress.
     """
     try:
         session = get_zendesk_session()
