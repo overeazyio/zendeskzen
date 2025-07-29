@@ -1,0 +1,27 @@
+{
+  "ticket_id": 12345,
+  "created_at": "2023-10-27T10:30:00Z",
+  "updated_at": "2023-10-27T12:00:00Z",
+  "subject": "Issue with billing",
+  "status": "closed",
+  "requester_id": 98765,
+  "assignee_id": 54321,
+  "tags": [
+    "billing",
+    "invoice"
+  ],
+  "conversation": [
+    {
+      "comment_id": 111,
+      "author_id": 98765,
+      "body": "Hello, I have a question about my recent invoice.",
+      "created_at": "2023-10-27T10:30:00Z"
+    },
+    {
+      "comment_id": 222,
+      "author_id": 54321,
+      "body": "Hi there, I can help with that. What is your question?",
+      "created_at": "2023-10-27T10:35:00Z"
+    }
+  ]
+}

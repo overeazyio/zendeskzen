@@ -1,4 +1,5 @@
 import os
+import json
 import requests
 from dotenv import load_dotenv
 
@@ -80,6 +81,28 @@ def fetch_ticket_comments(session, ticket_id):
     return comments
 
 
+def save_as_json(ticket_id, data):
+    """
+    Saves the structured data as a JSON file.
+    """
+    directory = "output/json"
+    os.makedirs(directory, exist_ok=True)
+    filepath = os.path.join(directory, f"{ticket_id}.json")
+    with open(filepath, "w") as f:
+        json.dump(data, f, indent=2)
+
+
+def save_as_xml(ticket_id, xml_string):
+    """
+    Saves the XML data as an XML file.
+    """
+    directory = "output/xml"
+    os.makedirs(directory, exist_ok=True)
+    filepath = os.path.join(directory, f"{ticket_id}.xml")
+    with open(filepath, "w") as f:
+        f.write(xml_string)
+
+
 if __name__ == "__main__":
     # Example Usage (without making live API calls)
     # You can replace this with actual API calls if you have credentials
@@ -124,3 +147,9 @@ if __name__ == "__main__":
     xml_data = convert_to_xml(structured_json)
     print("\nXML Data:")
     print(xml_data)
+
+    # 3. Save files
+    ticket_id = sample_ticket_data["id"]
+    save_as_json(ticket_id, structured_json)
+    save_as_xml(ticket_id, xml_data)
+    print(f"\nSaved ticket {ticket_id} as JSON and XML.")
