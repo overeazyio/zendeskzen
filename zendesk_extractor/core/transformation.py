@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+from xml.dom import minidom
 from typing import Dict, Any, List, Optional
 from zendesk_extractor.core.models import Ticket, Comment
 from dataclasses import asdict
@@ -79,4 +80,11 @@ def convert_to_xml(ticket: Ticket) -> Optional[str]:
             element = ET.SubElement(root, key)
             element.text = str(value)
 
-    return ET.tostring(root, encoding="unicode")
+    # Convert the ElementTree object to a string
+    xml_string = ET.tostring(root, encoding="unicode")
+
+    # Parse the XML string using minidom
+    dom = minidom.parseString(xml_string)
+
+    # Return the pretty-printed XML string
+    return dom.toprettyxml(indent="  ")
