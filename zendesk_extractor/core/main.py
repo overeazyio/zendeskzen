@@ -67,7 +67,7 @@ def fetch_tickets(session: Session, start_time: Optional[str] = None) -> Optiona
     params = {}
 
     if start_time:
-        params["query"] = f"type:ticket created>={start_time}"
+        params["query"] = f"type:ticket updated>={start_time}"
 
     while url:
         try:
@@ -192,7 +192,14 @@ def main() -> None:
     """
     try:
         session = get_zendesk_session()
-        start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+
+        last_run_file = "last_run.txt"
+        try:
+            with open(last_run_file, "r") as f:
+                start_date = f.read().strip()
+        except FileNotFoundError:
+            start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+
         tickets = fetch_tickets(session, start_time=start_date)
 
         if not tickets:
@@ -229,6 +236,9 @@ def main() -> None:
             except ZendeskExtractorError as e:
                 logging.error(f"An error occurred while processing ticket {ticket_id}: {e}")
                 continue
+
+        with open(last_run_file, "w") as f:
+            f.write(datetime.now().isoformat())
 
     except ZendeskExtractorError as e:
         logging.error(f"An unrecoverable error occurred: {e}")
