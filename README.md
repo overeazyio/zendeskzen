@@ -56,7 +56,7 @@ The web interface provides a simple way to interact with the Zendesk Data Extrac
 
 ```mermaid
 graph TD
-    A[Open Web Browser] --> B{Go to http://localhost:8000};
+    A[Open Web Browser] --> B{Go to <a href='http://localhost:8000'>http://localhost:8000</a>};
     B --> C[View existing files];
     C --> D{Click a file to open in new tab};
     B --> E[Click Extract Data button];
