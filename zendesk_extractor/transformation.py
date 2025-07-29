@@ -4,8 +4,18 @@ from .models import Ticket, Comment
 from dataclasses import asdict
 
 def transform_to_structured_json(ticket_data: Dict[str, Any], comments_data: List[Dict[str, Any]]) -> Optional[Ticket]:
-    """
-    Transforms raw ticket and comment data into a structured JSON format.
+    """Transforms raw ticket and comment data into a structured JSON format.
+
+    This function takes raw ticket and comment data from the Zendesk API and
+    transforms it into a structured `Ticket` object.
+
+    Args:
+        ticket_data: A dictionary representing the ticket data.
+        comments_data: A list of dictionaries, where each dictionary is a comment.
+
+    Returns:
+        A `Ticket` object with the transformed data, or `None` if the ticket data
+        is empty.
     """
     if not ticket_data:
         return None
@@ -34,8 +44,17 @@ def transform_to_structured_json(ticket_data: Dict[str, Any], comments_data: Lis
 
 
 def convert_to_xml(ticket: Ticket) -> Optional[str]:
-    """
-    Converts a Ticket object to an XML string.
+    """Converts a Ticket object to an XML string.
+
+    This function takes a `Ticket` object and converts it into an XML string
+    representation.
+
+    Args:
+        ticket: The `Ticket` object to be converted.
+
+    Returns:
+        An XML string representation of the ticket, or `None` if the ticket
+        object is empty.
     """
     if not ticket:
         return None
