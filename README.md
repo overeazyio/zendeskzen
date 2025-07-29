@@ -99,26 +99,26 @@ This approach ensures that the application only processes new or changed data, s
 
 ```mermaid
 graph TD
-    subgraph User Interaction
+    subgraph "User Interaction"
         A(User triggers extraction via Web UI)
     end
 
-    subgraph Web Application (FastAPI)
+    subgraph "Web Application (FastAPI)"
         B(POST /extract)
     end
 
-    subgraph Core Library (Python)
+    subgraph "Core Library (Python)"
         C(Get Zendesk Session)
         D(Fetch Tickets & Comments)
         E(Transform to Structured JSON)
         F(Convert to XML)
     end
 
-    subgraph Zendesk API
+    subgraph "Zendesk API"
         G(Zendesk Tickets API)
     end
 
-    subgraph Local Storage
+    subgraph "Local Storage"
         H(Save as JSON)
         I(Save as XML)
     end
