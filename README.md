@@ -1,11 +1,12 @@
 # Zendesk Data Extractor
 
-This project provides a simple and effective solution for extracting historical customer conversation data from Zendesk. It allows you to fetch ticket data, including full conversation histories, and save it in both JSON and XML formats. This is ideal for a variety of use cases, from data analysis and AI/ML modeling to manual review and archiving.
+This project offers a straightforward and efficient solution for extracting customer conversation data from Zendesk. It fetches ticket data, including complete conversation histories, and saves it in both JSON and XML formats. This makes it ideal for various applications, such as data analysis, AI/ML model training, and manual review.
 
-The application includes a web interface to easily trigger the extraction process and browse the extracted data.
+The application includes a web interface to trigger the extraction process and browse the extracted data.
 
 ## Key Features
 
+*   **Incremental Backups:** Automatically extracts only the tickets that have been updated since the last run, making the process more efficient.
 *   **Automated Data Extraction:** Programmatically extract ticket data from Zendesk, eliminating the need for manual data requests.
 *   **Dual-Format Output:** Get your data in both JSON (ideal for data processing) and XML (for easy manual review).
 *   **Simple Web Interface:** A user-friendly web UI to start the extraction process and view the results.
@@ -56,12 +57,12 @@ The web interface provides a simple way to interact with the Zendesk Data Extrac
 
 ```mermaid
 graph TD
-    A[Open Web Browser] --> B{Go to <a href='http://localhost:8000'>http://localhost:8000</a>};
-    B --> C[View existing files];
-    C --> D{Click a file to open in new tab};
-    B --> E[Click Extract Data button];
-    E --> F{Wait for extraction to complete};
-    F --> G[File list is refreshed];
+    A[Open Web Browser] --> B(Go to http://localhost:8000);
+    B --> C(View existing files);
+    C --> D(Click a file to open in new tab);
+    B --> E(Click Extract Data button);
+    E --> F(Wait for extraction to complete);
+    F --> G(File list is refreshed);
     G --> C;
 ```
 
@@ -86,40 +87,50 @@ The application is composed of two main components:
 
 The following diagram illustrates how data flows through the system:
 
+### Incremental Backups
+
+To improve efficiency, the application is designed to perform incremental backups. Here’s how it works:
+
+-   **Tracking the Last Run:** After each successful execution, the application saves the current timestamp in a file named `last_run.txt`.
+-   **Fetching Recent Tickets:** On the next run, the application reads this timestamp and uses it to fetch only the tickets that have been created or updated since the last execution.
+-   **First Run:** If `last_run.txt` does not exist (i.e., on the first run), the application will fetch all tickets from the last 30 days.
+
+This approach ensures that the application only processes new or changed data, significantly reducing the extraction time for subsequent runs.
+
 ```mermaid
 graph TD
-    subgraph "User Interaction"
-        A[User triggers extraction via Web UI]
+    subgraph User Interaction
+        A(User triggers extraction via Web UI)
     end
 
-    subgraph "Web Application (FastAPI)"
-        B[POST /extract]
+    subgraph Web Application (FastAPI)
+        B(POST /extract)
     end
 
-    subgraph "Core Library (Python)"
-        C[Get Zendesk Session]
-        D[Fetch Tickets & Comments]
-        E[Transform to Structured JSON]
-        F[Convert to XML]
+    subgraph Core Library (Python)
+        C(Get Zendesk Session)
+        D(Fetch Tickets & Comments)
+        E(Transform to Structured JSON)
+        F(Convert to XML)
     end
 
-    subgraph "Zendesk API"
-        G[Zendesk Tickets API]
+    subgraph Zendesk API
+        G(Zendesk Tickets API)
     end
 
-    subgraph "Local Storage"
-        H[Save as JSON]
-        I[Save as XML]
+    subgraph Local Storage
+        H(Save as JSON)
+        I(Save as XML)
     end
 
-    A --> B;
-    B --> C;
-    C --> D;
-    D <--> G;
-    D --> E;
-    E --> F;
-    E --> H;
-    F --> I;
+    A --> B
+    B --> C
+    C --> D
+    D <--> G
+    D --> E
+    E --> F
+    E --> H
+    F --> I
 ```
 
 ## Security Considerations
@@ -129,7 +140,6 @@ graph TD
 
 ## Future Enhancements
 
-*   **Incremental Backups:** Modify the script to only fetch tickets that have been updated since the last run. This would make the extraction process more efficient.
 *   **Database Integration:** Load the extracted data directly into a database (e.g., PostgreSQL, BigQuery) for more advanced querying and analysis.
 *   **Web UI Authentication:** Add a login system to the web interface to restrict access to authorized users.
-*   **Error Handling and Reporting:** Enhance the error handling and provide more detailed feedback in the web UI when an extraction fails.
+*   **Advanced Error Reporting:** Implement a more robust error reporting mechanism in the web UI to provide users with detailed feedback on extraction failures.
