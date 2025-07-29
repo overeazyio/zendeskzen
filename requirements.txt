@@ -3,3 +3,5 @@ python-dotenv
 dataclasses
 fastapi
 uvicorn[standard]
+pytest
+httpx
