@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 from typing import Dict, Any, List, Optional
-from models import Ticket, Comment
+from .models import Ticket, Comment
 from dataclasses import asdict
 
 def transform_to_structured_json(ticket_data: Dict[str, Any], comments_data: List[Dict[str, Any]]) -> Optional[Ticket]:
