@@ -78,3 +78,49 @@ def fetch_ticket_comments(session, ticket_id):
             return None
 
     return comments
+
+
+if __name__ == "__main__":
+    # Example Usage (without making live API calls)
+    # You can replace this with actual API calls if you have credentials
+
+    # Sample raw data
+    sample_ticket_data = {
+        "id": 12345,
+        "created_at": "2023-10-27T10:30:00Z",
+        "updated_at": "2023-10-27T12:00:00Z",
+        "subject": "Issue with billing",
+        "status": "closed",
+        "requester_id": 98765,
+        "assignee_id": 54321,
+        "tags": ["billing", "invoice"]
+    }
+
+    sample_comments_data = [
+        {
+            "id": 111,
+            "author_id": 98765,
+            "body": "Hello, I have a question about my recent invoice.",
+            "created_at": "2023-10-27T10:30:00Z"
+        },
+        {
+            "id": 222,
+            "author_id": 54321,
+            "body": "Hi there, I can help with that. What is your question?",
+            "created_at": "2023-10-27T10:35:00Z"
+        }
+    ]
+
+    # Import the transformation functions
+    from transformation import transform_to_structured_json, convert_to_xml
+
+    # 1. Transform to structured JSON
+    structured_json = transform_to_structured_json(sample_ticket_data, sample_comments_data)
+    print("Structured JSON:")
+    import json
+    print(json.dumps(structured_json, indent=2))
+
+    # 2. Convert to XML
+    xml_data = convert_to_xml(structured_json)
+    print("\nXML Data:")
+    print(xml_data)
