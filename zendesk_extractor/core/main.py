@@ -128,50 +128,57 @@ def fetch_ticket_comments(session: Session, ticket_id: int) -> Optional[List[Dic
 
 from zendesk_extractor.core.exceptions import FileSaveError
 
-def save_as_json(ticket_id: int, data: Ticket) -> None:
-    """Saves the structured data as a JSON file.
+def save_data_to_file(ticket_id: int, data: Any, file_extension: str) -> None:
+    """Saves data to a file with the given extension.
 
-    This function saves the given Ticket object as a JSON file in the
-    `output/json` directory. The filename is based on the ticket ID.
+    This function saves the given data to a file in the corresponding
+    `output/{file_extension}` directory. The filename is based on the ticket ID.
 
     Args:
         ticket_id: The ID of the ticket, used for the filename.
-        data: The Ticket object to be saved.
+        data: The data to be saved.
+        file_extension: The extension of the file (e.g., "json" or "xml").
 
     Raises:
         FileSaveError: If an error occurs while saving the file.
     """
     try:
-        directory = "output/json"
+        directory = f"output/{file_extension}"
         os.makedirs(directory, exist_ok=True)
-        filepath = os.path.join(directory, f"{ticket_id}.json")
+        filepath = os.path.join(directory, f"{ticket_id}.{file_extension}")
         with open(filepath, "w") as f:
-            json.dump(asdict(data), f, indent=2)
+            if file_extension == "json":
+                json.dump(asdict(data), f, indent=2)
+            else:
+                f.write(data)
     except (IOError, OSError) as e:
-        raise FileSaveError(f"Error saving JSON file for ticket {ticket_id}: {e}")
+        raise FileSaveError(f"Error saving {file_extension.upper()} file for ticket {ticket_id}: {e}")
+
+
+def save_as_json(ticket_id: int, data: Ticket) -> None:
+    """Saves the structured data as a JSON file.
+
+    This function saves the given Ticket object as a JSON file by calling
+    the generic save_data_to_file function.
+
+    Args:
+        ticket_id: The ID of the ticket, used for the filename.
+        data: The Ticket object to be saved.
+    """
+    save_data_to_file(ticket_id, data, "json")
 
 
 def save_as_xml(ticket_id: int, xml_string: str) -> None:
     """Saves the XML data as an XML file.
 
-    This function saves the given XML string as an XML file in the
-    `output/xml` directory. The filename is based on the ticket ID.
+    This function saves the given XML string as an XML file by calling
+    the generic save_data_to_file function.
 
     Args:
         ticket_id: The ID of the ticket, used for the filename.
         xml_string: The XML content to be saved.
-
-    Raises:
-        FileSaveError: If an error occurs while saving the file.
     """
-    try:
-        directory = "output/xml"
-        os.makedirs(directory, exist_ok=True)
-        filepath = os.path.join(directory, f"{ticket_id}.xml")
-        with open(filepath, "w") as f:
-            f.write(xml_string)
-    except (IOError, OSError) as e:
-        raise FileSaveError(f"Error saving XML file for ticket {ticket_id}: {e}")
+    save_data_to_file(ticket_id, xml_string, "xml")
 
 
 from zendesk_extractor.core.exceptions import ZendeskExtractorError
